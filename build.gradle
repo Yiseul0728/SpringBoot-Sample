@@ -1,7 +1,7 @@
 //프로젝트를 빌드하기 위해서 필요한 컴파일이나 jar 파일의 생성 같은 작업을 처리해줘야함
 //빌드시 필요한 모든 과정을 플러그인의 내부 task가 진행해줌.
 plugins {
-	id 'org.springframework.boot' version '2.4.4.RELEASE'
+	id 'org.springframework.boot' version '2.4.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
@@ -59,9 +59,9 @@ task installReact(type: Exec) {
 	} else {
 		commandLine "npm", "audit", "fix"
 		commandLine 'npm', 'install'
+	}
 }
 
-//
 
 test {
 	useJUnitPlatform()
