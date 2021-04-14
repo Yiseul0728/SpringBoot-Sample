@@ -1,5 +1,7 @@
+//프로젝트를 빌드하기 위해서 필요한 컴파일이나 jar 파일의 생성 같은 작업을 처리해줘야함
+//빌드시 필요한 모든 과정을 플러그인의 내부 task가 진행해줌.
 plugins {
-	id 'org.springframework.boot' version '2.4.4'
+	id 'org.springframework.boot' version '2.4.4.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
@@ -8,14 +10,58 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
-repositories {
+//소프트웨어(각종 라이브러리)를 등록하여 관리하는 장소 
+repositories { 
 	mavenCentral()
 }
 
-dependencies {
+//의존성에 관한 설정을 관리하는 프로퍼티
+//여기에 필요한 라이브러리 등의 정보를 기술하면 그 라이브러리를 참조함
+dependencies { 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+//react연동
+def webappDir = "$projectDir/src/main/sample"
+
+sourceSets {
+	main {
+		resources {
+			srcDirs = ["$webappDir/build", "$projectDir/src/main/resources"]
+		}
+	}
+}
+
+processResources {
+	dependsOn "buildReact"
+}
+
+task buildReact(type: Exec) {
+	dependsOn "installReact"
+	workingDir "$webappDir"
+	inputs.dir "$webappDir"
+	group = BasePlugin.BUILD_GROUP
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "npm.cmd", "run-script", "build"
+	} else {
+		commandLine "npm", "run-script", "build"
+	}
+}
+
+task installReact(type: Exec) {
+	workingDir "$webappDir"
+	inputs.dir "$webappDir"
+	group = BasePlugin.BUILD_GROUP
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "npm.cmd", "audit", "fix"
+		commandLine 'npm.cmd', 'install'
+	} else {
+		commandLine "npm", "audit", "fix"
+		commandLine 'npm', 'install'
+}
+
+//
 
 test {
 	useJUnitPlatform()
